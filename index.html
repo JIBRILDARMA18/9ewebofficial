@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Resmi Kelas Digital</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Brand/Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-slate-900 leading-tight">Portal Kelas X-IPA 1</h1>
+                        <p class="text-xs text-slate-500">Tahun Ajaran 2026/2027</p>
+                    </div>
+                </div>
+
+                <!-- Admin Status / Action Buttons -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <!-- Status Badge -->
+                    <span id="roleBadge" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                        <span class="w-2 h-2 rounded-full bg-slate-400 mr-1.5"></span> Mode Siswa
+                    </span>
+
+                    <!-- Admin Toggle / Login Button -->
+                    <button id="adminAuthBtn" onclick="openAuthModal()" class="px-3.5 py-1.5 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg transition-all shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-lock text-xs"></i> <span id="authBtnText">Login Admin</span>
+                    </button>
+
+                    <!-- Settings Button (Admin Only) -->
+                    <button id="settingsBtn" onclick="openSettingsModal()" class="hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="Pengaturan Admin">
+                        <i class="fa-solid fa-gear text-base"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- NAVIGATION TABS -->
+        <div class="border-b border-slate-200 overflow-x-auto custom-scrollbar">
+            <nav class="flex space-x-6 min-w-max" aria-label="Tabs">
+                <button onclick="switchTab('jadwal')" id="tab-jadwal" class="tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days"></i> Jadwal Pelajaran
+                </button>
+                <button onclick="switchTab('tugas')" id="tab-tugas" class="tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn"></i> Info & Tugas
+                </button>
+                <button onclick="switchTab('kas')" id="tab-kas" class="tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-wallet"></i> Kas Kelas
+                </button>
+                <button onclick="switchTab('sholat')" id="tab-sholat" class="tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-mosque"></i> Catatan Sholat
+                </button>
+                <button onclick="switchTab('pengurus')" id="tab-pengurus" class="tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> Inti Kelas
+                </button>
+            </nav>
+        </div>
+
+        <!-- TAB 1: JADWAL PELAJARAN -->
+        <section id="content-jadwal" class="tab-content block space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800">Jadwal Pelajaran Mingguan</h2>
+                    <p class="text-xs text-slate-500">Pilih hari untuk melihat alokasi mata pelajaran</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="dayFilter" onchange="renderJadwal()" class="bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-medium">
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                    </select>
+                    <button onclick="openAddJadwalModal()" class="admin-only hidden px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                        <i class="fa-solid fa-plus"></i> Tambah Mapel
+                    </button>
+                </div>
+            </div>
+
+            <div id="jadwalList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- TAB 2: INFO & TUGAS -->
+        <section id="content-tugas" class="tab-content hidden space-y-6">
+            <!-- Header Actions -->
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800">Info & Tugas Sekolah</h2>
+                    <p class="text-xs text-slate-500">Pantau tugas dan pengumuman kelas terbaru</p>
+                </div>
+                <button onclick="openAddTugasModal()" class="admin-only hidden px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                    <i class="fa-solid fa-plus"></i> Tambah Tugas/Info
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Pengumuman Section -->
+                <div class="lg:col-span-1 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-bullhorn text-amber-500"></i> Pengumuman Penting
+                    </h3>
+                    <div id="pengumumanList" class="space-y-3">
+                        <!-- Injected via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Daftar Tugas Section -->
+                <div class="lg:col-span-2 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-blue-500"></i> Daftar PR & Tugas
+                    </h3>
+                    <div id="tugasList" class="space-y-3">
+                        <!-- Injected via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: KAS KELAS -->
+        <section id="content-kas" class="tab-content hidden space-y-6">
+            <!-- Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs text-slate-500 font-medium">Total Pemasukan</p>
+                    <p id="totalPemasukan" class="text-xl font-bold text-emerald-600 mt-1">Rp 0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <p class="text-xs text-slate-500 font-medium">Total Pengeluaran</p>
+                    <p id="totalPengeluaran" class="text-xl font-bold text-rose-600 mt-1">Rp 0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100">
+                    <p class="text-xs text-blue-600 font-medium">Saldo Kas Saat Ini</p>
+                    <p id="saldoKas" class="text-xl font-bold text-blue-700 mt-1">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Content Split -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Student Kas Payment Status -->
+                <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-800">Status Pembayaran Kas Siswa (Rp 5.000/Minggu)</h3>
+                        <button onclick="openKasPaymentModal()" class="admin-only hidden px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold">
+                            + Catat Bayar
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">Nama Siswa</th>
+                                    <th class="p-3">Minggu 1</th>
+                                    <th class="p-3">Minggu 2</th>
+                                    <th class="p-3">Minggu 3</th>
+                                    <th class="p-3">Minggu 4</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kasSiswaTable" class="divide-y divide-slate-100">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Transaction History -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-slate-800">Riwayat Kas</h3>
+                        <button onclick="openAddKasModal()" class="admin-only hidden px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold">
+                            + Transaksi
+                        </button>
+                    </div>
+                    <div id="riwayatKasList" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar pr-1">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: CATATAN SHOLAT -->
+        <section id="content-sholat" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800">Catatan Sholat & Absensi Ibadah</h2>
+                    <p class="text-xs text-slate-500">Monitoring pelaksanaan ibadah harian siswa</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="date" id="sholatDateFilter" onchange="renderSholat()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-lg p-2 font-medium">
+                    <button onclick="openSholatModal()" class="admin-only hidden px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                        <i class="fa-solid fa-check-double"></i> Update Catatan
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3.5">Nama Siswa</th>
+                                <th class="p-3.5 text-center">Subuh</th>
+                                <th class="p-3.5 text-center">Dzuhur</th>
+                                <th class="p-3.5 text-center">Ashar</th>
+                                <th class="p-3.5 text-center">Maghrib</th>
+                                <th class="p-3.5 text-center">Isya</th>
+                                <th class="p-3.5 text-center">Persentase</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sholatTable" class="divide-y divide-slate-100">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: INTI KELAS -->
+        <section id="content-pengurus" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800">Struktur Pengurus Kelas</h2>
+                    <p class="text-xs text-slate-500">Daftar inti organisasi dan penanggung jawab kelas</p>
+                </div>
+                <button onclick="openPengurusModal()" class="admin-only hidden px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold">
+                    Edit Struktur
+                </button>
+            </div>
+
+            <div id="pengurusGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALS SECTION -->
+
+    <!-- Modal Admin Auth (Login) -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center space-y-2 mb-5">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Login Administrator</h3>
+                <p class="text-xs text-slate-500">Masukkan password admin untuk mengelola data</p>
+            </div>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                    <input type="password" id="adminPasswordInput" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Default: admin123">
+                </div>
+                <p id="authError" class="text-xs text-rose-500 hidden text-center font-medium">Password salah!</p>
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm">
+                    Masuk Mode Admin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Admin Settings (Ubah Password) -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 relative">
+            <button onclick="closeSettingsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center space-y-2 mb-5">
+                <div class="w-12 h-12 bg-slate-100 text-slate-700 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Ubah Password Admin</h3>
+                <p class="text-xs text-slate-500">Perbarui kata sandi untuk keamanan portal</p>
+            </div>
+            <form onsubmit="handleChangePassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password Baru</label>
+                    <input type="password" id="newPassword" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirmPassword" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm mt-2">
+                    Simpan Password Baru
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Dynamic (Shared for Add/Edit Form Tasks/Jadwal/Kas/Sholat) -->
+    <div id="genericModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeGenericModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 id="genericModalTitle" class="text-lg font-bold text-slate-800 mb-4">Form Data</h3>
+            <div id="genericModalBody">
+                <!-- Dynamic Content Form Injected Here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- INITIAL STATE & LOCALSTORAGE DATA MANAGEMENT ---
+        const DEFAULT_PASS = "admin123";
+        let isAdmin = false;
+
+        // Initial Sample Data
+        const initialData = {
+            adminPassword: DEFAULT_PASS,
+            jadwal: [
+                { id: 1, hari: "Senin", mapel: "Matematika Peminatan", jam: "07:30 - 09:00", guru: "Pak Budi", ruangan: "R.101" },
+                { id: 2, hari: "Senin", mapel: "Fisika", jam: "09:15 - 10:45", guru: "Bu Ratna", ruangan: "Lab Fisika" },
+                { id: 3, hari: "Selasa", mapel: "Bahasa Indonesia", jam: "07:30 - 09:00", guru: "Bu Siti", ruangan: "R.101" },
+                { id: 4, hari: "Selasa", mapel: "Kimia", jam: "09:15 - 11:30", guru: "Pak Ahmad", ruangan: "Lab Kimia" },
+                { id: 5, hari: "Rabu", mapel: "Biologi", jam: "07:30 - 09:45", guru: "Bu Dewa", ruangan: "Lab Biologi" },
+                { id: 6, hari: "Kamis", mapel: "Bahasa Inggris", jam: "07:30 - 09:00", guru: "Mr. John", ruangan: "R.101" },
+                { id: 7, hari: "Jumat", mapel: "Pendidikan Agama", jam: "07:30 - 09:00", guru: "Pak Ustaz", ruangan: "R.101" }
+            ],
+            tugas: [
+                { id: 1, tipe: "tugas", judul: "Latihan Soal Lensa Fisika", mapel: "Fisika", deadline: "2026-10-15", detail: "Kerjakan Halaman 45 No. 1-10 di buku catatan.", selesai: false },
+                { id: 2, tipe: "pengumuman", judul: "Kerja Bakti Kebersihan Kelas", mapel: "Umum", deadline: "2026-10-12", detail: "Membawa alat kebersihan masing-masing dari rumah.", selesai: false }
+            ],
+            pengurus: [
+                { jabatan: "Ketua Kelas", nama: "Aditya Pratama", kontak: "081234567890", foto: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" },
+                { jabatan: "Wakil Ketua", nama: "Siti Rahmawati", kontak: "081234567891", foto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80" },
+                { jabatan: "Sekretaris", nama: "Dian Sastro", kontak: "081234567892", foto: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80" },
+                { jabatan: "Bendahara", nama: "Rian Dwi", kontak: "081234567893", foto: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80" }
+            ],
+            siswa: ["Aditya Pratama", "Siti Rahmawati", "Dian Sastro", "Rian Dwi", "Ahmad Fauzi", "Budi Santoso", "Citra Lestari", "Eka Putri"],
+            kasPembayaran: {
+                "Aditya Pratama": [true, true, true, false],
+                "Siti Rahmawati": [true, true, true, true],
+                "Dian Sastro": [true, true, false, false],
+                "Rian Dwi": [true, true, true, true],
+                "Ahmad Fauzi": [true, false, false, false],
+                "Budi Santoso": [true, true, true, false],
+                "Citra Lestari": [true, true, true, true],
+                "Eka Putri": [true, true, false, false]
+            },
+            kasRiwayat: [
+                { id: 1, tipe: "masuk", jumlah: 120000, keterangan: "Setoran Kas Minggu 1 & 2", tanggal: "2026-10-01" },
+                { id: 2, tipe: "keluar", jumlah: 35000, keterangan: "Beli Spidol Whiteboard & Penghapus", tanggal: "2026-10-04" }
+            ],
+            sholatData: {} // Format: { "YYYY-MM-DD": { "Nama Siswa": { subuh: true, dzuhur: true, ashar: true, maghrib: true, isya: true } } }
+        };
+
+        // Load data from LocalStorage or Set Default
+        function loadStorageData() {
+            if (!localStorage.getItem("portal_kelas_db")) {
+                localStorage.setItem("portal_kelas_db", JSON.stringify(initialData));
+            }
+            return JSON.parse(localStorage.getItem("portal_kelas_db"));
+        }
+
+        function saveStorageData(db) {
+            localStorage.setItem("portal_kelas_db", JSON.stringify(db));
+        }
+
+        // Initialize Global App State
+        let db = loadStorageData();
+
+        // --- STREAMING_CHUNK:Handling Authentication and Admin Modes... ---
+        // AUTHENTICATION LOGIC
+        function openAuthModal() {
+            if (isAdmin) {
+                // Logout Action
+                isAdmin = false;
+                updateRoleUI();
+                showNotification("Berhasil Logout dari Mode Admin");
+            } else {
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('authError').classList.add('hidden');
+                document.getElementById('authModal').classList.remove('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('adminPasswordInput').value;
+            if (pass === db.adminPassword) {
+                isAdmin = true;
+                closeAuthModal();
+                updateRoleUI();
+                showNotification("Login Admin Berhasil!");
+            } else {
+                document.getElementById('authError').classList.remove('hidden');
+            }
+        }
+
+        function updateRoleUI() {
+            const badge = document.getElementById('roleBadge');
+            const btnText = document.getElementById('authBtnText');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const adminElements = document.querySelectorAll('.admin-only');
+
+            if (isAdmin) {
+                badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Mode Admin`;
+                btnText.textContent = "Logout Admin";
+                settingsBtn.classList.remove('hidden');
+                adminElements.forEach(el => el.classList.remove('hidden'));
+            } else {
+                badge.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200";
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400 mr-1.5"></span> Mode Siswa`;
+                btnText.textContent = "Login Admin";
+                settingsBtn.classList.add('hidden');
+                adminElements.forEach(el => el.classList.add('hidden'));
+            }
+
+            // Re-render current visible components to apply edit controls
+            renderJadwal();
+            renderTugas();
+            renderKas();
+            renderSholat();
+            renderPengurus();
+        }
+
+        // SETTINGS & PASSWORD CHANGE
+        function openSettingsModal() {
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function handleChangePassword(e) {
+            e.preventDefault();
+            const p1 = document.getElementById('newPassword').value;
+            const p2 = document.getElementById('confirmPassword').value;
+
+            if (p1 !== p2) {
+                alert("Konfirmasi password tidak cocok!");
+                return;
+            }
+
+            db.adminPassword = p1;
+            saveStorageData(db);
+            closeSettingsModal();
+            showNotification("Password Admin berhasil diperbarui!");
+        }
+
+        // TAB SWITCHING LOGIC
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2";
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+
+            document.getElementById(`tab-${tabName}`).className = "tab-btn px-1 py-3 text-sm font-semibold border-b-2 border-blue-600 text-blue-600 flex items-center gap-2";
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`content-${tabName}`).classList.add('block');
+        }
+
+        // --- STREAMING_CHUNK:Rendering Jadwal Pelajaran Module... ---
+        // MODULE 1: JADWAL PELAJARAN
+        function renderJadwal() {
+            const hariFilter = document.getElementById('dayFilter').value;
+            const container = document.getElementById('jadwalList');
+            const items = db.jadwal.filter(j => j.hari === hariFilter);
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8 bg-white rounded-xl border border-dashed border-slate-300">
+                        <i class="fa-solid fa-calendar-xmark text-slate-300 text-3xl mb-2"></i>
+                        <p class="text-sm font-medium text-slate-500">Tidak ada jadwal pelajaran untuk hari ${hariFilter}</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow relative">
+                    ${isAdmin ? `
+                        <button onclick="deleteJadwal(${item.id})" class="absolute top-3 right-3 text-slate-300 hover:text-rose-600 transition-colors">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    ` : ''}
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="p-2 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs">
+                            <i class="fa-solid fa-clock mr-1"></i> ${item.jam}
+                        </span>
+                        <span class="text-xs font-semibold px-2 py-1 bg-slate-100 rounded text-slate-600">${item.ruangan}</span>
+                    </div>
+                    <h4 class="font-bold text-slate-800 text-base mb-1">${item.mapel}</h4>
+                    <p class="text-xs text-slate-500 flex items-center gap-1">
+                        <i class="fa-solid fa-user-tie text-slate-400"></i> ${item.guru}
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        function openAddJadwalModal() {
+            const body = `
+                <form onsubmit="saveJadwal(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Hari</label>
+                        <select id="jHari" class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                            <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mata Pelajaran</label>
+                        <input type="text" id="jMapel" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Jam Pelajaran</label>
+                        <input type="text" id="jJam" placeholder="misal: 07:30 - 09:00" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Guru Pengampu</label>
+                        <input type="text" id="jGuru" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ruangan</label>
+                        <input type="text" id="jRuangan" placeholder="misal: R.101" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg text-xs mt-2">Simpan Mapel</button>
+                </form>
+            `;
+            openGenericModal("Tambah Mata Pelajaran", body);
+        }
+
+        function saveJadwal(e) {
+            e.preventDefault();
+            const newItem = {
+                id: Date.now(),
+                hari: document.getElementById('jHari').value,
+                mapel: document.getElementById('jMapel').value,
+                jam: document.getElementById('jJam').value,
+                guru: document.getElementById('jGuru').value,
+                ruangan: document.getElementById('jRuangan').value
+            };
+            db.jadwal.push(newItem);
+            saveStorageData(db);
+            closeGenericModal();
+            renderJadwal();
+            showNotification("Mata pelajaran berhasil ditambahkan");
+        }
+
+        function deleteJadwal(id) {
+            if (confirm("Hapus mapel ini dari jadwal?")) {
+                db.jadwal = db.jadwal.filter(j => j.id !== id);
+                saveStorageData(db);
+                renderJadwal();
+                showNotification("Mapel berhasil dihapus");
+            }
+        }
+
+        // --- STREAMING_CHUNK:Rendering Info & Tugas Module... ---
+        // MODULE 2: INFO & TUGAS
+        function renderTugas() {
+            const pengumumanContainer = document.getElementById('pengumumanList');
+            const tugasContainer = document.getElementById('tugasList');
+
+            const infoList = db.tugas.filter(t => t.tipe === 'pengumuman');
+            const prList = db.tugas.filter(t => t.tipe === 'tugas');
+
+            // Render Pengumuman
+            if (infoList.length === 0) {
+                pengumumanContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada pengumuman.</p>`;
+            } else {
+                pengumumanContainer.innerHTML = infoList.map(item => `
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 relative">
+                        ${isAdmin ? `
+                            <button onclick="deleteTugas(${item.id})" class="absolute top-2 right-2 text-amber-400 hover:text-amber-700">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        ` : ''}
+                        <h4 class="font-bold text-amber-900 text-xs mb-1">${item.judul}</h4>
+                        <p class="text-xs text-amber-800 leading-relaxed">${item.detail}</p>
+                        <p class="text-[10px] text-amber-600 mt-2 font-medium"><i class="fa-regular fa-clock"></i> ${item.deadline}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Render PR / Tugas
+            if (prList.length === 0) {
+                tugasContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Tidak ada tugas aktif saat ini.</p>`;
+            } else {
+                tugasContainer.innerHTML = prList.map(item => `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-start justify-between gap-3 shadow-sm ${item.selesai ? 'opacity-60 bg-slate-50' : ''}">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.selesai ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}">
+                                    ${item.mapel}
+                                </span>
+                                <span class="text-xs text-slate-400 font-medium"><i class="fa-regular fa-calendar-xmark text-rose-500"></i> ${item.deadline}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm ${item.selesai ? 'line-through' : ''}">${item.judul}</h4>
+                            <p class="text-xs text-slate-500">${item.detail}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleTugasSelesai(${item.id})" class="px-2.5 py-1 rounded-lg text-xs font-semibold ${item.selesai ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                                ${item.selesai ? '<i class="fa-solid fa-check"></i> Selesai' : 'Tandai Selesai'}
+                            </button>
+                            ${isAdmin ? `
+                                <button onclick="deleteTugas(${item.id})" class="p-1.5 text-slate-300 hover:text-rose-600">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openAddTugasModal() {
+            const body = `
+                <form onsubmit="saveTugas(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tipe Content</label>
+                        <select id="tTipe" class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                            <option value="tugas">Tugas / PR</option>
+                            <option value="pengumuman">Pengumuman Penting</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Judul Info / Tugas</label>
+                        <input type="text" id="tJudul" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mata Pelajaran (Kosongkan jika pengumuman)</label>
+                        <input type="text" id="tMapel" placeholder="misal: Fisika" class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Deadline / Tanggal Event</label>
+                        <input type="date" id="tDeadline" required class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan / Detail</label>
+                        <textarea id="tDetail" rows="3" required class="w-full p-2 border border-slate-300 rounded-lg text-xs"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg text-xs mt-2">Simpan Info/Tugas</button>
+                </form>
+            `;
+            openGenericModal("Tambah Info atau Tugas", body);
+        }
+
+        function saveTugas(e) {
+            e.preventDefault();
+            const newItem = {
+                id: Date.now(),
+                tipe: document.getElementById('tTipe').value,
+                judul: document.getElementById('tJudul').value,
+                mapel: document.getElementById('tMapel').value || 'Umum',
+                deadline: document.getElementById('tDeadline').value,
+                detail: document.getElementById('tDetail').value,
+                selesai: false
+            };
+            db.tugas.push(newItem);
+            saveStorageData(db);
+            closeGenericModal();
+            renderTugas();
+            showNotification("Data berhasil disimpan");
+        }
+
+        function toggleTugasSelesai(id) {
+            const item = db.tugas.find(t => t.id === id);
+            if (item) {
+                item.selesai = !item.selesai;
+                saveStorageData(db);
+                renderTugas();
+            }
+        }
+
+        function deleteTugas(id) {
+            if (confirm("Hapus pengumuman/tugas ini?")) {
+                db.tugas = db.tugas.filter(t => t.id !== id);
+                saveStorageData(db);
+                renderTugas();
+                showNotification("Data berhasil dihapus");
+            }
+        }
+
+        // --- STREAMING_CHUNK:Rendering Kas Kelas Module... ---
+        // MODULE 3: KAS KELAS
+        function renderKas() {
+            // Totals
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+
+            db.kasRiwayat.forEach(r => {
+                if (r.tipe === 'masuk') totalMasuk += r.jumlah;
+                else totalKeluar += r.jumlah;
+            });
+
+            document.getElementById('totalPemasukan').textContent = `Rp ${totalMasuk.toLocaleString('id-ID')}`;
+            document.getElementById('totalPengeluaran').textContent = `Rp ${totalKeluar.toLocaleString('id-ID')}`;
+            document.getElementById('saldoKas').textContent = `Rp ${(totalMasuk - totalKeluar).toLocaleString('id-ID')}`;
+
+            // Table Kas Siswa
+            const tableBody = document.getElementById('kasSiswaTable');
+            tableBody.innerHTML = db.siswa.map(nama => {
+                const p = db.kasPembayaran[nama] || [false, false, false, false];
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 font-semibold text-slate-700">${nama}</td>
+                        ${p.map((status, idx) => `
+                            <td class="p-3">
+                                <button ${isAdmin ? `onclick="toggleKasBayar('${nama}', ${idx})"` : ''} class="px-2 py-1 rounded text-[11px] font-semibold ${status ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                                    ${status ? 'Lunas' : 'Belum'}
+                                </button>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `;
+            }).join('');
+
+            // History List
+            const historyContainer = document.getElementById('riwayatKasList');
+            if (db.kasRiwayat.length === 0) {
+                historyContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada transaksi.</p>`;
+            } else {
+                historyContainer.innerHTML = db.kasRiwayat.slice().reverse().map(r => `
+                    <div class="flex justify-between items-center p-2.5 rounded-lg border border-slate-100 bg-slate-50 text-xs">
+                        <div>
+                            <p class="font-semibold text-slate-700">${r.keterangan}</p>
+                            <p class="text-[10px] text-slate-400">${r.tanggal}</p>
+                        </div>
+                        <span class="font-bold ${r.tipe === 'masuk' ? 'text-emerald-600' : 'text-rose-600'}">
+                            ${r.tipe === 'masuk' ? '+' : '-'} Rp ${r.jumlah.toLocaleString('id-ID')}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleKasBayar(nama, mingguIndex) {
+            if (!db.kasPembayaran[nama]) db.kasPembayaran[nama] = [false, false, false, false];
+            db.kasPembayaran[nama][mingguIndex] = !db.kasPembayaran[nama][mingguIndex];
+            
+            // Auto add entry to transactions if marked as paid
+            if (db.kasPembayaran[nama][mingguIndex]) {
+                db.kasRiwayat.push({
+                    id: Date.now(),
+                    tipe: 'masuk',
+                    jumlah: 5000,
+                    keterangan: `Kas ${nama} (M-${mingguIndex+1})`,
+                    tanggal: new Date().toISOString().split('T')[0]
+                });
+            }
+            saveStorageData(db);
+            renderKas();
+        }
+
+        function openAddKasModal() {
+            const body = `
+                <form onsubmit="saveKasTransaksi(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tipe Transaksi</label>
+                        <select id="kTipe" class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                            <option value="masuk">Pemasukan (+)</option>
+                            <option value="keluar">Pengeluaran (-)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Keterangan</label>
+                        <input type="text" id="kKet" required placeholder="misal: Beli Alat Kebersihan" class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Nominal (Rp)</label>
+                        <input type="number" id="kJumlah" required placeholder="10000" class="w-full p-2 border border-slate-300 rounded-lg text-xs">
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg text-xs mt-2">Catat Transaksi</button>
+                </form>
+            `;
+            openGenericModal("Catat Transaksi Kas Baru", body);
+        }
+
+        function saveKasTransaksi(e) {
+            e.preventDefault();
+            const newItem = {
+                id: Date.now(),
+                tipe: document.getElementById('kTipe').value,
+                keterangan: document.getElementById('kKet').value,
+                jumlah: parseInt(document.getElementById('kJumlah').value) || 0,
+                tanggal: new Date().toISOString().split('T')[0]
+            };
+            db.kasRiwayat.push(newItem);
+            saveStorageData(db);
+            closeGenericModal();
+            renderKas();
+            showNotification("Transaksi kas berhasil ditambahkan");
+        }
+
+        // --- STREAMING_CHUNK:Rendering Catatan Sholat Module... ---
+        // MODULE 4: CATATAN SHOLAT
+        function renderSholat() {
+            const dateInput = document.getElementById('sholatDateFilter');
+            if (!dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+            const dateKey = dateInput.value;
+            const currentDayData = db.sholatData[dateKey] || {};
+
+            const tableBody = document.getElementById('sholatTable');
+            tableBody.innerHTML = db.siswa.map(nama => {
+                const s = currentDayData[nama] || { subuh: false, dzuhur: false, ashar: false, maghrib: false, isya: false };
+                const count = [s.subuh, s.dzuhur, s.ashar, s.maghrib, s.isya].filter(Boolean).length;
+                const percent = (count / 5) * 100;
+
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 font-semibold text-slate-700">${nama}</td>
+                        ${['subuh','dzuhur','ashar','maghrib','isya'].map(waktu => `
+                            <td class="p-3 text-center">
+                                <button ${isAdmin ? `onclick="toggleSholat('${dateKey}', '${nama}', '${waktu}')"` : ''} class="w-6 h-6 rounded-md inline-flex items-center justify-center text-xs transition-colors ${s[waktu] ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-300'}">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </td>
+                        `).join('')}
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold ${percent === 100 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                ${percent}%
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleSholat(dateKey, nama, waktu) {
+            if (!db.sholatData[dateKey]) db.sholatData[dateKey] = {};
+            if (!db.sholatData[dateKey][nama]) {
+                db.sholatData[dateKey][nama] = { subuh: false, dzuhur: false, ashar: false, maghrib: false, isya: false };
+            }
+            db.sholatData[dateKey][nama][waktu] = !db.sholatData[dateKey][nama][waktu];
+            saveStorageData(db);
+            renderSholat();
+        }
+
+        // --- STREAMING_CHUNK:Rendering Inti Kelas / Pengurus Module... ---
+        // MODULE 5: INTI KELAS
+        function renderPengurus() {
+            const container = document.getElementById('pengurusGrid');
+            container.innerHTML = db.pengurus.map(p => `
+                <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm relative space-y-2">
+                    <img src="${p.foto}" alt="${p.nama}" class="w-16 h-16 rounded-full object-cover mx-auto ring-2 ring-blue-500/20">
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600">${p.jabatan}</span>
+                        <h4 class="font-bold text-slate-800 text-sm mt-1">${p.nama}</h4>
+                        <p class="text-xs text-slate-500 mt-0.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> ${p.kontak}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openPengurusModal() {
+            const body = `
+                <form onsubmit="savePengurus(event)" class="space-y-3">
+                    <p class="text-xs text-slate-500 mb-2">Perbarui data pengurus utama kelas</p>
+                    ${db.pengurus.map((p, idx) => `
+                        <div class="border-b border-slate-100 pb-2 space-y-1">
+                            <label class="block text-xs font-bold text-blue-600">${p.jabatan}</label>
+                            <input type="text" id="pNama_${idx}" value="${p.nama}" required class="w-full p-2 border border-slate-300 rounded-lg text-xs" placeholder="Nama Lengkap">
+                            <input type="text" id="pKontak_${idx}" value="${p.kontak}" required class="w-full p-2 border border-slate-300 rounded-lg text-xs" placeholder="No HP/WA">
+                        </div>
+                    `).join('')}
+                    <button type="submit" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg text-xs mt-2">Simpan Struktur Pengurus</button>
+                </form>
+            `;
+            openGenericModal("Edit Pengurus Kelas", body);
+        }
+
+        function savePengurus(e) {
+            e.preventDefault();
+            db.pengurus.forEach((p, idx) => {
+                p.nama = document.getElementById(`pNama_${idx}`).value;
+                p.kontak = document.getElementById(`pKontak_${idx}`).value;
+            });
+            saveStorageData(db);
+            closeGenericModal();
+            renderPengurus();
+            showNotification("Struktur pengurus diperbarui");
+        }
+
+        // --- SHARED UTILS & MODALS ---
+        function openGenericModal(title, contentHtml) {
+            document.getElementById('genericModalTitle').textContent = title;
+            document.getElementById('genericModalBody').innerHTML = contentHtml;
+            document.getElementById('genericModal').classList.remove('hidden');
+        }
+
+        function closeGenericModal() {
+            document.getElementById('genericModal').classList.add('hidden');
+        }
+
+        function showNotification(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2 animate-bounce';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- ON INITIAL LOAD ---
+        window.onload = function() {
+            renderJadwal();
+            renderTugas();
+            renderKas();
+            renderSholat();
+            renderPengurus();
+        };
+    </script>
+</body>
+</html>
